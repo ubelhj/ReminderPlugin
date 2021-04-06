@@ -1,0 +1,7 @@
+Reminder Plugin
+9|Sets reminders to activate after each match
+12|Every match reminder|reminder_every_game
+8|
+5|Extra Reminder every X games|reminder_extra_reminder_games|1|10
+12|Extra reminder every few matches|reminder_extra_reminder
+9|Plugin made by JerryTheBee#1117 DM me on discord for custom plugins
