@@ -5,46 +5,53 @@
 BAKKESMOD_PLUGIN(Reminders, "write a plugin description here", plugin_version, PLUGINTYPE_FREEPLAY)
 
 std::shared_ptr<CVarManagerWrapper> _globalCvarManager;
+std::string everyGame = "Take a sip of water";
+std::string extraReminder = "Take an eye break, look outside for 20 seconds";
 
-void Reminders::onLoad()
-{
+int numGamesExtra = 5;
+int currentGame = numGamesExtra;
+
+
+void Reminders::onLoad() {
 	_globalCvarManager = cvarManager;
-	//cvarManager->log("Plugin loaded!");
 
-	//cvarManager->registerNotifier("my_aweseome_notifier", [&](std::vector<std::string> args) {
-	//	cvarManager->log("Hello notifier!");
-	//}, "", 0);
+	cvarManager->registerCvar("reminder_every_game", everyGame, "Sets reminder for every game")
+		.addOnValueChanged([this](std::string, CVarWrapper cvar) {
+			everyGame = cvar.getStringValue();
+			});
 
-	//auto cvar = cvarManager->registerCvar("template_cvar", "hello-cvar", "just a example of a cvar");
-	//auto cvar2 = cvarManager->registerCvar("template_cvar2", "0", "just a example of a cvar with more settings", true, true, -10, true, 10 );
+	cvarManager->registerCvar("reminder_extra_reminder", extraReminder, "Sets reminder for every x games")
+		.addOnValueChanged([this](std::string, CVarWrapper cvar) {
+			extraReminder = cvar.getStringValue();
+			});
 
-	//cvar.addOnValueChanged([this](std::string cvarName, CVarWrapper newCvar) {
-	//	cvarManager->log("the cvar with name: " + cvarName + " changed");
-	//	cvarManager->log("the new value is:" + newCvar.getStringValue());
-	//});
+	cvarManager->registerCvar("reminder_extra_reminder_games", std::to_string(numGamesExtra), 
+		"Number of games between extra reminders")
+		.addOnValueChanged([this](std::string, CVarWrapper cvar) {
+			numGamesExtra = cvar.getIntValue();
+			if (currentGame > numGamesExtra) {
+				currentGame = numGamesExtra;
+			}
+			});
+	
+	gameWrapper->HookEvent("Function TAGame.GameEvent_Soccar_TA.EventMatchEnded", [this](std::string eventName) {
+		matchEnded();
+	});
 
-	//cvar2.addOnValueChanged(std::bind(&Reminders::YourPluginMethod, this, _1, _2));
-
-	// enabled decleared in the header
-	//enabled = std::make_shared<bool>(false);
-	//cvarManager->registerCvar("TEMPLATE_Enabled", "0", "Enable the TEMPLATE plugin", true, true, 0, true, 1).bindTo(enabled);
-
-	//cvarManager->registerNotifier("NOTIFIER", [this](std::vector<std::string> params){FUNCTION();}, "DESCRIPTION", PERMISSION_ALL);
-	//cvarManager->registerCvar("CVAR", "DEFAULTVALUE", "DESCRIPTION", true, true, MINVAL, true, MAXVAL);//.bindTo(CVARVARIABLE);
-	//gameWrapper->HookEvent("FUNCTIONNAME", std::bind(&TEMPLATE::FUNCTION, this));
-	//gameWrapper->HookEventWithCallerPost<ActorWrapper>("FUNCTIONNAME", std::bind(&Reminders::FUNCTION, this, _1, _2, _3));
-	//gameWrapper->RegisterDrawable(bind(&TEMPLATE::Render, this, std::placeholders::_1));
-
-
-	//gameWrapper->HookEvent("Function TAGame.Ball_TA.Explode", [this](std::string eventName) {
-	//	cvarManager->log("Your hook got called and the ball went POOF");
-	//});
-	// You could also use std::bind here
-	//gameWrapper->HookEvent("Function TAGame.Ball_TA.Explode", std::bind(&Reminders::YourPluginMethod, this);
 	cvarManager->executeCommand("cl_notifications_enabled_beta 1");
-	gameWrapper->Toast("Reminder", "Take a sip of water");
+	
 }
 
-void Reminders::onUnload()
-{
+void Reminders::onUnload() {
+}
+
+void Reminders::matchEnded() {
+	gameWrapper->Toast("Reminder", everyGame, "default", 5.0F);
+
+	currentGame--;
+
+	if (currentGame == 0) {
+		currentGame = numGamesExtra;
+		gameWrapper->Toast("Reminder", extraReminder, "default", 5.0F);
+	}
 }

@@ -16,22 +16,6 @@ class Reminders: public BakkesMod::Plugin::BakkesModPlugin/*, public BakkesMod::
 	virtual void onLoad();
 	virtual void onUnload();
 
-	// Inherited via PluginWindow
-	/*
-
-	bool isWindowOpen_ = false;
-	bool isMinimized_ = false;
-	std::string menuTitle_ = "Reminders";
-
-	virtual void Render() override;
-	virtual std::string GetMenuName() override;
-	virtual std::string GetMenuTitle() override;
-	virtual void SetImGuiContext(uintptr_t ctx) override;
-	virtual bool ShouldBlockInput() override;
-	virtual bool IsActiveOverlay() override;
-	virtual void OnOpen() override;
-	virtual void OnClose() override;
-	
-	*/
+	void matchEnded();
 };
 
