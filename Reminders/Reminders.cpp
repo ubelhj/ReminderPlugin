@@ -35,7 +35,7 @@ void Reminders::onLoad() {
 		matchEnded();
 	});
 
-	cvarManager->executeCommand("cl_notifications_enabled_beta 1");
+	
 	
 }
 
@@ -43,6 +43,9 @@ void Reminders::onUnload() {
 }
 
 void Reminders::matchEnded() {
+	bool prevValue = cvarManager->getCvar("cl_notifications_enabled_beta").getBoolValue();
+	cvarManager->executeCommand("cl_notifications_enabled_beta 1");
+
 	gameWrapper->Toast("Reminder", everyGame, "default", 5.0F);
 
 	currentGame--;
@@ -51,4 +54,6 @@ void Reminders::matchEnded() {
 		currentGame = numGamesExtra;
 		gameWrapper->Toast("Reminder", extraReminder, "default", 5.0F);
 	}
+
+	cvarManager->executeCommand("cl_notifications_enabled_beta " + std::to_string(prevValue));
 }
